@@ -1,9 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace GameHost1.Cells
 {
     public class Cell
     {
         public CellStateEnum State{get; private set;}
+
         public Cell(CellStateEnum initState)
         {
             State = initState;
@@ -24,43 +28,43 @@ namespace GameHost1.Cells
 
         private void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
         {
-            int aliveCellAroundMe = 0;
-
-            foreach(ConnectionTunnelDelegate tunnel in CallTunnel.GetInvocationList())
+            var echo_count = 0;
+            foreach(ＨowlDelegate howl in Howl.GetInvocationList())
             {
-                if(string.IsNullOrEmpty(tunnel.Invoke()) == false) aliveCellAroundMe ++;
+                if(string.IsNullOrEmpty(howl.Invoke()) == false) echo_count ++;
             }
+
+            // foreach(ConnectionTunnelDelegate tunnel in CallTunnel.GetInvocationList())
+            // {
+            //     if(string.IsNullOrEmpty(tunnel.Invoke()) == false) aliveCellAroundMe ++;
+            // }
             
             if(this.State == CellStateEnum.Alive)
             {
-                if(aliveCellAroundMe < 2){ this.State = CellStateEnum.Dead; return;}
-                if(aliveCellAroundMe ==2 || aliveCellAroundMe == 3){ this.State = CellStateEnum.Alive; return;}
-                if(aliveCellAroundMe > 3){ this.State = CellStateEnum.Dead; return;}
+                if(echo_count < 2){ this.State = CellStateEnum.Dead; return;}
+                if(echo_count ==2 || echo_count == 3){ this.State = CellStateEnum.Alive; return;}
+                if(echo_count > 3){ this.State = CellStateEnum.Dead; return;}
             }
 
-            this.State = aliveCellAroundMe == 3 ? CellStateEnum.Alive : CellStateEnum.Dead;
+            this.State = echo_count == 3 ? CellStateEnum.Alive : CellStateEnum.Dead;
         }
 
-        public string Echo()
+        public string Response()
         {
             return State == CellStateEnum.Alive ? "hi" : string.Empty; 
         }
 
-        public delegate string ConnectionTunnelDelegate();
-        public ConnectionTunnelDelegate CallTunnel;
+        // public delegate string ConnectionTunnelDelegate();
+        // public ConnectionTunnelDelegate CallTunnel;
 
-        // public void Connect(ConnectionTunnelDelegate requestTunnel,ConnectionTunnelDelegate responseTunnel)
+        // public void Connect(Cell relateCell)
         // {
         //     //互相建立連線
-        //     requestTunnel += Echo;
-        //     CallTunnel += responseTunnel;
+        //     relateCell.CallTunnel += Echo;
+        //     CallTunnel += relateCell.Echo;
         // }
 
-        public void Connect(Cell relateCell)
-        {
-            //互相建立連線
-            relateCell.CallTunnel += Echo;
-            CallTunnel += relateCell.Echo;
-        }
+        public delegate string ＨowlDelegate();
+        public ＨowlDelegate Howl;
     }
 }
